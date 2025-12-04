@@ -3,7 +3,7 @@ const app = express()
 const port = 8080
 
 app.get('/', (req, res) => {
-  res.send('Welcome to <bakery-ecommerce-webapp name');
+  res.send('Welcome to tart ecommerce webapp');
 });
 
 app.listen(port, () => {
