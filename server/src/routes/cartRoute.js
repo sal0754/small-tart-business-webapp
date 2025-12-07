@@ -59,3 +59,26 @@ router.get("/carts/delete_from_cart", async (req, res) => {
     }
 })
 
+// updating quantity of an item already in the cart
+router.put("/carts/update_quantity", async (req, res) => {
+    const { cart_id, tart_id, quantity } = req.body;
+
+    try {
+        const result = await pool.query(
+            `UPDATE cart_items
+             SET quantity = $1
+             WHERE cart_id = $2 AND tart_id = $3
+             RETURNING *`,
+            [quantity, cart_id, tart_id]
+        );
+
+        if (result.rowCount === 0) {
+            return res.status(404).json({ error: "Item not found in cart" });
+        }
+
+        res.json(result.rows[0]);
+    } catch (err) {
+        res.status(500).json({ error: "Server error" });
+    }
+});
+
