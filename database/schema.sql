@@ -9,7 +9,10 @@ CREATE TABLE IF NOT EXISTS Users(
 CREATE TABLE IF NOT EXISTS Tart(
     tart_id SERIAL PRIMARY KEY,
     price DECIMAL(10,2) NOT NULL,
-    tart_type VARCHAR(200)
+    tart_type VARCHAR(200),
+    tart_name VARCHAR(200),
+    image_url TEXT,
+    tart_description TEXT
 
 );
 -- table for customer orders 
@@ -44,3 +47,18 @@ CREATE TABLE IF NOT EXISTS Reviews (
     FOREIGN KEY (user_id) REFERENCES Users(user_id),
     FOREIGN KEY (tart_id) REFERENCES Tart(tart_id)
 );
+CREATE TABLE carts (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id INTEGER REFERENCES users(id),
+    created_at TIMESTAMP DEFAULT now()
+);
+
+CREATE TABLE cart_items(
+    id SERIAL PRIMARY KEY,
+    cart_id UUID REFERENCES carts(id) ON DELETE CASCADE,
+    tart_id INTEGER NOT NULL,
+    quantity INTEGER NOT NULL CHECK (quantity > 0),
+    added_at TIMESTAMP DEFAULT now()
+    FOREIGN KEY (tart_id) REFERENCES Tart(tart_id)
+);
+
