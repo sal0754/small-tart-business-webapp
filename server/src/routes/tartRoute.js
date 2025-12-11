@@ -119,3 +119,52 @@ router.get("/tarts/edit-tart", async (req, res) => {
   }
 });
 
+// Route to apply search filters based on price, category
+// And sort tarts alphabetically
+router.get("/tarts/search-tarts", async (req, res) => {
+  try {
+    const { category, minPrice, maxPrice, sort } = req.query;
+
+    let filters = [];
+    let values = [];
+    let index = 1;
+
+    if (category) {
+      filters.push(`tart_type = $${index}`);
+      values.push(category);
+      index++;
+    }
+
+    if (minPrice) {
+      filters.push(`price >= $${index}`);
+      values.push(minPrice);
+      index++;
+    }
+
+    if (maxPrice) {
+      filters.push(`price <= $${index}`);
+      values.push(maxPrice);
+      index++;
+    }
+
+    let query = `SELECT * FROM Tart`;
+
+    if (filters.length > 0) {
+      query += " WHERE " + filters.join(" AND ");
+    }
+
+    if (sort === "asc") {
+      query += " ORDER BY tart_name ASC";
+    } else if (sort === "desc") {
+      query += " ORDER BY tart_name DESC";
+    }
+
+    const result = await pool.query(query, values);
+
+    res.json(result.rows);
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server Error" });
+  }
+});
