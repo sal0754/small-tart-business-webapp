@@ -79,7 +79,7 @@ router.put("/carts/update_quantity", async (req, res) => {
         if (result.rowCount === 0) {
             return res.status(404).json({ error: "Item not found in cart" });
         }
-        // writes result to JSON file
+        // Sending JSON response
         res.json(result.rows[0]);
     } catch (err) {
         res.status(500).json({ error: "Server error" });
