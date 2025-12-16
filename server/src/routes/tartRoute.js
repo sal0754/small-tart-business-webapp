@@ -168,3 +168,42 @@ router.get("/tarts/search-tarts", async (req, res) => {
     res.status(500).json({ error: "Server Error" });
   }
 });
+
+router.get("/tarts/order-tarts", async (req, res)=>{
+  const {userId, cartItems} = req.body;
+  // Waiting for Postgres connection
+  const client = await pool.connect();
+  try{
+    // Beginning Transaction
+    await client.query('BEGIN');
+    // Inserting Order into the CustomerOrder table
+    const orderResult = await client.query(
+      `INSERT INTO CustomerOrder (user_id)
+       VALUES ($1)
+       RETURNING order_id`,
+      [userId]
+    );
+
+    const orderId = orderResult.rows[0].order_id;
+    for(const item of cartItems){
+      await client.query(`INSERT INTO OrderItems (order_id, tart_id, quantity) VALUES ($1, $2, $3)`, [orderId, item.tartId, item.quantity]);
+    }
+    // Saving Data
+    await client.query('COMMIT');
+
+    res.status(201).json({
+      message: 'Order created',
+      orderId
+    });
+
+  } catch (err) {
+      // Undoing Everything because of the Error
+      await client.query('ROLLBACK');
+      console.error(err);
+      res.status(500).json({ error: 'Order failed' });
+  } finally {
+    client.release();
+  }
+
+
+});

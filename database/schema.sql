@@ -19,7 +19,6 @@ CREATE TABLE IF NOT EXISTS Tart(
 CREATE TABLE IF NOT EXISTS CustomerOrder(
     order_id SERIAL PRIMARY KEY,
     user_id INT NOT NULL,
-    tart_id INT NOT NULL,
     order_status VARCHAR(90),
     FOREIGN KEY (user_id) REFERENCES Users(user_id),
     FOREIGN KEY (tart_id) REFERENCES Tart(tart_id)
