@@ -1,0 +1,200 @@
+import pool from '../config/databaseConnection.js';
+
+export const viewTarts = async (req, res) => {
+  try {
+    // Query to get the tart_name and price for every tart in the Tart table
+    const result = await pool.query("SELECT tart_name, price, tart_type FROM Tart");
+    res.json(result.rows);
+    console.log("tarts selected from tart table in db")
+  } catch (err) {
+    res.status(500).json({ error: "Server error" });
+  }
+};
+
+export const previewTarts = async(req, res)=>{
+    // Checking if the specific tart exists in the database
+    try {
+          const { tart_id } = req.query; 
+
+    if (!tart_id) {
+      return res.status(400).json({ error: "Missing tart_id" });
+    }
+    // This query gets the description of the tart alongisde other
+    // Additional information for a specific tart
+    const result = await pool.query("SELECT tart_name, price, tart_type, tart_description, image_url FROM Tart WHERE tart_id = $1", [req.query.tart_id]);
+    // Sending json response 
+    res.json(result.rows);
+    console.log("specific tart selected")
+  } catch (err) {
+    res.status(500).json({ error: "Server error" });
+  }
+
+};
+
+export const addTarts = async(req, res) =>{
+    try{
+        const result = await pool.query(`INSERT INTO Tart (price, tart_type, tart_name,image_url,tart_description)
+             VALUES ($1, $2, $3, $4, $5)
+             RETURNING *`,
+            [req.query.price, req.query.tart_type, req.query.tart_name, req.query.image_url, req.query.tart_description]);
+  } catch(err){
+    res.status(500).json({error: "Server Error"});
+  }
+};
+
+export const deleteTarts = async(req, res)=>{
+     try {
+    const tartId = req.query.tart_id;
+
+    const result = await pool.query(
+      `DELETE FROM Tart WHERE tart_id = $1 RETURNING *`,
+      [tartId]
+    );
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: "Tart not found" });
+    }
+
+    res.json({
+      message: "Tart deleted successfully",
+      deletedTart: result.rows[0],
+    });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server Error" });
+  }
+
+};
+
+export const editTarts = async (req, res)=>{
+    try {
+        const tartId = req.query.tart_id;
+
+        const fields = [];
+        const values = [];
+        let index = 1;
+
+        // Building a dymanic SQL query based on user input (i.e which fields are edited)
+        for (const key in req.query) {
+        if (key === "tart_id") continue; 
+        fields.push(`${key} = $${index}`);
+        values.push(req.query[key]);
+        index++;
+        }
+
+        if (fields.length === 0) {
+        return res.status(400).json({ error: "No fields provided to update" });
+        }
+
+        values.push(tartId);
+
+        const query = `
+        UPDATE Tart
+        SET ${fields.join(", ")}
+        WHERE tart_id = $${index}
+        RETURNING *
+        `;
+
+        const result = await pool.query(query, values);
+
+        if (result.rowCount === 0) {
+        return res.status(404).json({ error: "Tart not found" });
+        }
+
+        res.json({
+        message: "Tart updated successfully :)",
+        updatedTart: result.rows[0],
+        });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server Error" });
+  }
+};
+
+export const searchTarts = async (req, res)=>{
+      try {
+    const { category, minPrice, maxPrice, sort } = req.query;
+
+    let filters = [];
+    let values = [];
+    let index = 1;
+
+    if (category) {
+      filters.push(`tart_type = $${index}`);
+      values.push(category);
+      index++;
+    }
+
+    if (minPrice) {
+      filters.push(`price >= $${index}`);
+      values.push(minPrice);
+      index++;
+    }
+
+    if (maxPrice) {
+      filters.push(`price <= $${index}`);
+      values.push(maxPrice);
+      index++;
+    }
+
+    let query = `SELECT * FROM Tart`;
+
+    if (filters.length > 0) {
+      query += " WHERE " + filters.join(" AND ");
+    }
+
+    if (sort === "asc") {
+      query += " ORDER BY tart_name ASC";
+    } else if (sort === "desc") {
+      query += " ORDER BY tart_name DESC";
+    }
+
+    const result = await pool.query(query, values);
+
+    res.json(result.rows);
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server Error" });
+  }
+};
+
+export const orderTarts = async (req, res)=>{
+    const {userId, cartItems} = req.body;
+    // Waiting for Postgres connection
+    const client = await pool.connect();
+    try{
+        // Beginning Transaction
+        await client.query('BEGIN');
+        // Inserting Order into the CustomerOrder table
+        const orderResult = await client.query(
+        `INSERT INTO CustomerOrder (user_id)
+        VALUES ($1)
+        RETURNING order_id`,
+        [userId]
+        );
+
+        const orderId = orderResult.rows[0].order_id;
+        for(const item of cartItems){
+        await client.query(`INSERT INTO OrderItems (order_id, tart_id, quantity) VALUES ($1, $2, $3)`, [orderId, item.tartId, item.quantity]);
+        }
+        // Saving Data
+        await client.query('COMMIT');
+
+        res.status(201).json({
+        message: 'Order created',
+        orderId
+        });
+
+    } catch (err) {
+        // Undoing Everything because of the Error
+        await client.query('ROLLBACK');
+        console.error(err);
+        res.status(500).json({ error: 'Order failed' });
+    } finally {
+        client.release();
+    }
+
+};

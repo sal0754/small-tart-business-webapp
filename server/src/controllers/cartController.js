@@ -1,3 +1,5 @@
+//======= Cart CRUD =======
+
 import pool from '../config/databaseConnection.js';
 
 // Helper function to get total price of items in a cart

@@ -3,7 +3,7 @@ import {getAllOrders, changeOrderStatus} from '../controllers/adminOrderControll
 
 const router = Router();
 
-router.get("/adminOrders/admin-view-orders", getOrders);
+router.get("/adminOrders/admin-view-orders", getAllOrders);
 
 router.get("/adminOrders/change-order-status", changeOrderStatus);
 

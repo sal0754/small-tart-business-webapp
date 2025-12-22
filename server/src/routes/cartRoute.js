@@ -1,9 +1,5 @@
-//======= Cart CRUD =======
+//======= Cart Routes =======
 
-// Importing express and databaseConnection file to connect to the DB
-// const { Router } = require("express");
-// const router = require("express").Router()
-// const pool = require("../config/databaseConnection.js")
 import { Router } from 'express';
 import {getTotalCost, 
     viewTarts, 
