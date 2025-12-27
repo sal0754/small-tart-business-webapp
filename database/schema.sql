@@ -1,7 +1,7 @@
 --Admin users can upload tarts and set their price
 CREATE TABLE IF NOT EXISTS Users(
     user_id SERIAL PRIMARY KEY,
-    email VARCHAR(200),
+    email VARCHAR(200) UNIQUE NOT NULL,
     hashed_password VARCHAR(100),
     user_role VARCHAR(90)
 );
