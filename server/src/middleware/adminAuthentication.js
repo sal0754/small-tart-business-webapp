@@ -10,18 +10,17 @@ export function requireAuth(req, res, next) {
     }
 
     try {
-    const payload = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = payload; 
-    return next();
+        const payload = jwt.verify(token, process.env.JWT_SECRET);
+        req.user = payload; 
+        return next();
     } catch (err) {
-    return res.status(401).json({ message: "Invalid or expired token" });
+        return res.status(401).json({ message: "Invalid or expired token" });
     }
 }
 
 export const adminAuth = (req, res, next) => {
     if(!req.user){
         return res.status(403).json({ message: 'Not authenticated' });
-
 
     }
     if(!req.user.role === 'ADMIN'){
