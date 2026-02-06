@@ -1,15 +1,15 @@
-const { Pool } = require('pg');
-require("dotenv").config();
+// const { Pool } = require('pg');
+// require("dotenv").config();
+import dotenv from "dotenv";
+import pg from "pg";
 
-const pool = Pool();
+dotenv.config()
+const {Pool}=pg
 
-// Using env variables to hide database connection details
-pool = new Pool({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_DATABASE,
-  port: process.env.DB_PORT,
-});
 
-module.exports = pool;
+
+
+const pool = new Pool();
+
+// module.exports = pool;
+export default pool;
