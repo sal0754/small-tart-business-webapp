@@ -1,26 +1,12 @@
-import { useEffect, useState } from "react"
+import { Routes, Route } from "react-router-dom";
+import Landing from "./pages/Landing.jsx";
 
 function App() {
-  const [message, setMessage] = useState("Loading...")
-
-  useEffect(() => {
-    fetch("/api/db-test")
-      .then(res => res.json())
-      .then(data => {
-        setMessage(JSON.stringify(data, null, 2))
-      })
-      .catch(err => {
-        console.error(err)
-        setMessage("❌ Could not reach backend / database")
-      })
-  }, []) // <-- this means "run once when page loads"
-
   return (
-    <div style={{ padding: 20 }}>
-      <h1>Backend / DB Test</h1>
-      <pre>{message}</pre>
-    </div>
-  )
+    <Routes>
+      <Route path="/" element={<Landing />} />
+    </Routes>
+  );
 }
 
-export default App
+export default App;
