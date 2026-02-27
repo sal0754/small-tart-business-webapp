@@ -1,15 +1,17 @@
-@import url("https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Cedarville+Cursive&display=swap");
 
 .landing {
   min-height: 100vh;
-  background: #3f63b5;
-  color: white;
-  padding: 2rem 4rem;
+  background: #2E60B0;
+  color: rgb(255, 255, 255);
+  padding: 5rem 15rem 20rem;
   box-sizing: border-box;
 }
 
 .main-heading{
-  font-family: "Patrick Hand", cursive
+  font-family: "Cedarville Cursive";
+  padding: 2rem 2rem;
+
 }
 
 .landing-nav {
@@ -83,8 +85,8 @@
 }
 
 .landing-image img {
-  width: 420px;
+  width: 400px;
   max-width: 100%;
-  border-radius: 16px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+  border-radius: 0px;
+  box-shadow: 30px 20px 40px rgba(1, 1, 1, 1);
 }

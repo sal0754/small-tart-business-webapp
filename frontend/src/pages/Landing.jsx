@@ -21,7 +21,7 @@ function Landing() {
 
       <div className="landing-content">
         <div className="landing-text">
-          <h1 classname="main-heading">
+          <h1 className="main-heading">
             Handcrafted tarts<br />
             made to brighten<br />
             every moment
@@ -33,7 +33,7 @@ function Landing() {
             </Link>
 
             <Link to="/tart-builder" className="btn secondary">
-              Order Tarts
+              Tart Builder
             </Link>
           </div>
         </div>
