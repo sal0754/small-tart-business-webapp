@@ -10,6 +10,6 @@ This webapp is being developed as a solution for a client looking to start a sma
 
 ## How to run it
 ### Prerequisites
-- PostgreSQL 14
+- PostgreSQL 15
 
 
